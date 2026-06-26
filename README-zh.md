@@ -6,11 +6,11 @@
     <em>把深度价值"捡烟蒂"投资理念量化落地 A 股市场</em>
   </p>
   <p align="center">
-    <img src="https://img.shields.io/badge/license-Apache--2.0-blue" alt="License">
-    <img src="https://img.shields.io/badge/阶段-0%20脚手架%20✅-brightgreen" alt="Phase">
-    <img src="https://img.shields.io/badge/平台-聚官认证-blue" alt="Platform">
-    <img src="https://img.shields.io/badge/语言-Python%203.13-blue" alt="Language">
-    <img src="https://img.shields.io/badge/状态-仅研究-lightgrey" alt="Status">
+    <img src="https://img.shields.io/badge/license-Apache--2.0-blue" alt="许可证">
+    <img src="https://img.shields.io/badge/phase-0%20Scaffolding%20✅-brightgreen" alt="阶段">
+    <img src="https://img.shields.io/badge/platform-JoinQuant-blue" alt="平台">
+    <img src="https://img.shields.io/badge/language-Python%203.13-blue" alt="语言">
+    <img src="https://img.shields.io/badge/status-Research%20Only-lightgrey" alt="状态">
   </p>
 </p>
 
