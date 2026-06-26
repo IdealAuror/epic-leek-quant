@@ -166,7 +166,7 @@ def is_data_available_at(
 # ============================================================
 
 def get_stock_pool(
-    index_id: str = '000300.XSHG',
+    index_id: Optional[str] = '000300.XSHG',
     date: Optional[str | dt.datetime | pd.Timestamp] = None,
     exclude_st: bool = True,
     min_listed_days: int = 180,
@@ -174,7 +174,7 @@ def get_stock_pool(
     """构建股票池。
 
     口径（PROJECT-PLAN.md §1.1）：
-    - 取指数成分股；
+    - 取指数成分股（index_id=None 时取全 A）；
     - 剔除 ST / *ST（用 `get_extras('is_st', ...)`，对应 B5）；
     - 剔除上市不满 `min_listed_days` 天的次新股；
     - 退市股由 `get_all_securities(date=date)` 自然过滤（仅含当日仍上市的），
@@ -182,7 +182,7 @@ def get_stock_pool(
 
     Parameters
     ----------
-    index_id : 指数代码。默认沪深 300。可换 '000905.XSHG'（中证 500）或全 A。
+    index_id : 指数代码。默认沪深 300。可换 '000905.XSHG'（中证 500）或 None（全 A）。
     date : 调仓日。None 表示当前。
     exclude_st : 是否剔除 ST。
     min_listed_days : 上市天数下限。
@@ -195,7 +195,11 @@ def get_stock_pool(
     else:
         date_str = pd.Timestamp(date).strftime('%Y-%m-%d')
 
-    stocks = get_index_stocks(index_id, date=date_str)  # type: ignore[name-defined]
+    if index_id is None:
+        sec_df = get_all_securities(['stock'], date=date_str)  # type: ignore[name-defined]
+        stocks = list(sec_df.index)
+    else:
+        stocks = get_index_stocks(index_id, date=date_str)  # type: ignore[name-defined]
 
     # ST 剔除：用 get_extras 取当日 is_st 标记，避免遍历 display_name（B5）
     if exclude_st and len(stocks) > 0:
@@ -235,6 +239,29 @@ def get_st_stocks(stocks: Sequence[str], date: str) -> list[str]:
         return []
     row = df.iloc[-1]
     return [s for s in stocks if s in row.index and row[s]]
+
+
+def fetch_actual_controller(
+    stock_list: Sequence[str],
+    date: str | dt.datetime | pd.Timestamp,
+) -> dict[str, str]:
+    """查询实际控制人映射 {code -> actual_controller}。
+
+    通过聚宽 finance.STK_COMPANY_INFO 表查询。返回 dict 而非 DataFrame，
+    方便 merge 到因子 DataFrame。
+    """
+    if not _HAS_JQDATA or len(stock_list) == 0:
+        return {}
+    from jqdata import finance
+    q = query(  # type: ignore[name-defined]
+        finance.STK_COMPANY_INFO.actual_controller,
+        finance.STK_COMPANY_INFO.code,
+    ).filter(finance.STK_COMPANY_INFO.code.in_(list(stock_list)))
+    date_str = pd.Timestamp(date).strftime('%Y-%m-%d')
+    df = get_fundamentals(q, date=date_str)  # type: ignore[name-defined]
+    if df is None or df.empty:
+        return {}
+    return dict(zip(df['code'], df['actual_controller']))
 
 
 # ============================================================
