@@ -34,6 +34,84 @@ import pandas as pd
 
 
 # ============================================================
+# 零、聚宽交易 API 兼容垫片（应对不同引擎注入差异）
+# ============================================================
+
+def _resolve_jq_func(name):
+    """安全解析聚宽注入的全局函数，找不到返回 None。"""
+    obj = globals().get(name)
+    if obj is not None:
+        return obj
+    try:
+        import builtins
+        return getattr(builtins, name, None)
+    except Exception:
+        return None
+
+
+def _get_current_price(code, date_str):
+    """通过 get_price 获取最新收盘价，供降级计算目标股数。"""
+    df = get_price(code, end_date=date_str, count=1,
+                   fields=['close'], skip_paused=False)
+    if df is None or df.empty:
+        return None
+    return float(df.iloc[-1]['close'])
+
+
+def _safe_order_target_percent(context, code, weight):
+    """降级链下单封装，兼容聚宽各引擎交易函数注入差异。
+
+    Level 1: order_target_percent（原生目标占比）
+    Level 2: order_target_value（目标市值 = total_value × weight）
+    Level 3: order_target（目标股数，整手处理）
+    Level 4: order（与当前持仓差额下单）
+    全不可用: 抛 RuntimeError（而非 NameError）
+    """
+    total_value = context.portfolio.total_value
+
+    # Level 1: 原生 order_target_percent
+    fn = _resolve_jq_func('order_target_percent')
+    if fn is not None:
+        return fn(code, weight)
+
+    # Level 2: order_target_value（目标市值）
+    fn = _resolve_jq_func('order_target_value')
+    if fn is not None:
+        return fn(code, total_value * weight)
+
+    # 取当前持仓与价格，用于 Level 3/4
+    current_date = context.current_dt.strftime('%Y-%m-%d')
+    price = _get_current_price(code, current_date)
+    positions = context.portfolio.positions
+    pos = positions.get(code)
+    current_amount = pos.total_amount if pos is not None else 0
+
+    # Level 3: order_target（目标股数，整手处理）
+    fn = _resolve_jq_func('order_target')
+    if fn is not None:
+        if price is None or price <= 0:
+            raise RuntimeError('无法获取 %s 价格以计算目标股数' % code)
+        target_shares = int(total_value * weight / price / 100) * 100
+        return fn(code, target_shares)
+
+    # Level 4: order（差额下单，整手处理）
+    fn = _resolve_jq_func('order')
+    if fn is not None:
+        if price is None or price <= 0:
+            raise RuntimeError('无法获取 %s 价格以计算差额股数' % code)
+        target_shares = int(total_value * weight / price / 100) * 100
+        delta = target_shares - current_amount
+        if delta != 0:
+            return fn(code, delta)
+        return None
+
+    raise RuntimeError(
+        '聚宽交易函数 order_target_percent/order_target_value/'
+        'order_target/order 均未注入，请确认在聚宽回测环境中运行'
+    )
+
+
+# ============================================================
 # 一、股票池与 ST/次新股剔除
 # ============================================================
 
@@ -140,7 +218,7 @@ def rebalance_ordered(context, target_weights):
         if target_weights.get(code, 0.0) > 0:
             continue
         if simulate_limit_order(code, 'sell', current_date) > 0:
-            order_target_percent(code, 0)
+            _safe_order_target_percent(context, code, 0)
             result['sold'].append(code)
             log.info('卖出 %s' % code)
         else:
@@ -151,7 +229,7 @@ def rebalance_ordered(context, target_weights):
         if weight <= 0:
             continue
         if simulate_limit_order(code, 'buy', current_date) > 0:
-            order_target_percent(code, weight)
+            _safe_order_target_percent(context, code, weight)
             result['bought'].append(code)
             log.info('买入 %s, 权重 %.2f%%' % (code, weight * 100))
         else:
