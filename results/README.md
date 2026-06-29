@@ -30,7 +30,7 @@ results/<spec_id>/
 ```
 research/specs/<spec_id>.md   (spec，预注册通过标准)
     ↓ Flash 执行
-joinquant/strategies/<spec_id>.py  (执行代码)
+archive/joinquant/strategies/<spec_id>.py  (执行代码，已归档)
     ↓ 聚宽运行
 results/<spec_id>/            (本目录，原始输出)
     ↓ 代码审核 + 结果判定

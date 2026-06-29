@@ -1,4 +1,4 @@
-# epic-leek-quant Python 依赖
+# cst-quant Python 依赖
 # 聚宽研究环境兼容版本（2026 Q2 聚宽平台内置版本）
 #
 # 注意：

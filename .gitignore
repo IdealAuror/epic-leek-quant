@@ -1,6 +1,7 @@
 # ==================== Python ====================
 # WorkBuddy agent workspace (NOT temporary cache — do not commit)
 .workbuddy/
+.codebuddy/
 __pycache__/
 *.py[cod]
 *$py.class
