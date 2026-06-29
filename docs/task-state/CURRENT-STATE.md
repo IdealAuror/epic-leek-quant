@@ -3,7 +3,7 @@
 > **用途**：跨会话/跨设备同步项目执行进度。每次会话开始先读本文件，结束前更新。
 > **最后更新**：2026-06-29
 > **当前阶段**：🟢 **项目已关闭** — Phase 5 跨样本验证 PASS（AllA/CSI300/CSI500 三样本 OVERALL: PASS），F6-MOM 40d 动量因子有效性在全部样本确认。最终策略：F2(EP)+F5(LowVol)+F6(MOM-40d) 三因子等权 Z-score，策略环境年化 ~15.6%/Sharpe 0.64/回撤 34.93%，研究环境 Sharpe 0.82/回撤 43.56%。`docs/CURRENT-STRATEGY.md` 为最终策略总览，`docs/manual-investment-guide.md` 为普通人实盘指南。
-> **单一事实来源**：`docs/PROJECT-PLAN.md`（口径冲突以此为准）；本文件仅记录执行流程进度。
+> **单一事实来源**：`docs/CURRENT-STRATEGY.md`（最终策略总览）；本文件仅记录执行流程进度。
 > **详细决策与结论**：`research/decisions/P1-F1-EV-2026Q2-v1-decision.md`（已演变为 Phase 1 全因子决策总文档）+ `research/_index.md`（因子看板）。
 
 ---

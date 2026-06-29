@@ -74,7 +74,7 @@
 
 ## 三、待验证假设登记
 
-> 原文档（`epic-leek-value-investing.md`）的乐观数字一律降级为待验证假设，登记于此。
+> 原文档（`archive/epic-leek-value-investing.md`）的乐观数字一律降级为待验证假设，登记于此。
 > 验证后在此标注 ✅已证实 / ❌已证伪 / ⚠️部分成立。
 > H9-H15 来自 `research/theory-framework.md` 互联网检索整理（2026-06-26）。
 

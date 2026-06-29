@@ -49,13 +49,11 @@
 cst-quant/
 ├── README.md
 ├── README-zh.md
-├── epic-leek-value-investing.md
 ├── requirements.txt
 ├── LICENSE
-├── archive/                           # 历史归档
+├── archive/                           # 历史归档（理论原文 + 早期代码）
 ├── docs/
 │   ├── CURRENT-STRATEGY.md            # 最终策略总览
-│   ├── PROJECT-PLAN.md                # 执行计划
 │   ├── manual-investment-guide.md     # 手动实盘指南
 │   ├── prompts/                       # 研究流水线 (00-04)
 │   └── task-state/                    # 任务状态与调试笔记

@@ -183,7 +183,6 @@
 |------|------|
 | `results/manual-investment-guide.html` | 投资操作手册（网页版，推荐） |
 | `docs/manual-investment-guide.md` | 普通人手动实盘操作指南 |
-| `docs/PROJECT-PLAN.md` | 项目统一执行计划 |
 | `research/_index.md` | 研究看板（因子状态/假设/迭代） |
 | `research/reports/P5-F6-MOM-2026Q2-v1-adjudication.md` | Phase 5 终判报告 |
 | `docs/task-state/CURRENT-STATE.md` | 任务状态看板 |

@@ -50,13 +50,11 @@ Score = ⅓·Z(EP) + ⅓·Z(−Vol) + ⅓·Z(MOM)  →  top 50
 cst-quant/
 ├── README.md
 ├── README-zh.md
-├── epic-leek-value-investing.md
 ├── requirements.txt
 ├── LICENSE
-├── archive/                           # Deprecated scripts
+├── archive/                           # Historical archive (theory doc, legacy code)
 ├── docs/
 │   ├── CURRENT-STRATEGY.md            # Final strategy overview
-│   ├── PROJECT-PLAN.md                # Execution plan
 │   ├── manual-investment-guide.md     # Manual investing guide
 │   ├── prompts/                       # Research workflow prompts (00-04)
 │   └── task-state/                    # Task state & debug notes
