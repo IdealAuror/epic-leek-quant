@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>普通人投资操作手册 — CST-Quant</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;700;900&display=swap');
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'Inter', 'Noto Sans SC', system-ui, sans-serif;
+    line-height: 1.72;
+    color: #2d2d2d;
+    background: #f0f2f5;
+    padding: 24px;
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 880px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+    overflow: hidden;
+  }
+
+  /* ── Header ─────────────────── */
+  .hdr {
+    background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+    color: #fff;
+    padding: 36px 32px;
+    text-align: center;
+  }
+  .hdr .badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #e0e0ff;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 14px;
+    border-radius: 20px;
+    letter-spacing: 0.06em;
+    margin-bottom: 14px;
+  }
+  .hdr h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 4px; }
+  .hdr h1 em { font-style: normal; color: #ffd54f; }
+  .hdr .sub { font-size: 14px; opacity: 0.75; margin-bottom: 20px; }
+
+  .hdr .kpis {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+  }
+  .hdr .kpis .kp {
+    text-align: center;
+    min-width: 80px;
+  }
+  .hdr .kpis .kp .v {
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+  .hdr .kpis .kp .v.up { color: #69f0ae; }
+  .hdr .kpis .kp .v.dn { color: #ff8a80; }
+  .hdr .kpis .kp .lb {
+    font-size: 10px;
+    color: rgba(255,255,255,0.55);
+    margin-top: 3px;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+  }
+
+  /* ── Nav ────────────────────── */
+  .nav {
+    display: flex;
+    gap: 2px;
+    overflow-x: auto;
+    justify-content: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #e8e8e8;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(8px);
+  }
+  .nav a {
+    padding: 7px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #777;
+    text-decoration: none;
+    white-space: nowrap;
+    border-radius: 6px;
+    transition: 0.15s;
+  }
+  .nav a:hover { color: #1a237e; background: #f0f0f5; }
+
+  /* ── Section ────────────────── */
+  .sec {
+    padding: 28px 32px;
+    border-bottom: 1px solid #e8e8e8;
+    scroll-margin-top: 48px;
+  }
+  .sec:last-of-type { border-bottom: none; }
+  .sec h2 {
+    font-size: 18px;
+    color: #1a237e;
+    margin-bottom: 18px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #3f51b5;
+  }
+
+  /* ── Callout (left border) ──── */
+  .cl {
+    padding: 16px 20px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+    border-left: 4px solid;
+    font-size: 13px;
+    line-height: 1.75;
+  }
+  .cl .cl-t { font-size: 14px; font-weight: 700; display: block; margin-bottom: 3px; }
+  .cl.g { background: #e8f5e9; border-color: #4caf50; color: #2e7d32; }
+  .cl.o { background: #fff3e0; border-color: #ff9800; color: #e65100; }
+  .cl.r { background: #ffebee; border-color: #f44336; color: #c62828; }
+  .cl.b { background: #e3f2fd; border-color: #2196f3; color: #0d47a1; }
+
+  /* ── Table ──────────────────── */
+  .tw { overflow-x: auto; margin-bottom: 16px; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  th, td {
+    padding: 10px 14px;
+    text-align: left;
+    border: 1px solid #e0e0e0;
+  }
+  th {
+    background: #f5f5f5;
+    font-weight: 600;
+    color: #444;
+    font-size: 12px;
+  }
+  tr:hover td { background: #fafafa; }
+
+  /* ── Tag ────────────────────── */
+  .tag {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .tag.g { background: #e8f5e9; color: #2e7d32; }
+  .tag.o { background: #fff3e0; color: #e65100; }
+  .tag.r { background: #ffebee; color: #c62828; }
+
+  /* ── Card ───────────────────── */
+  .c {
+    background: #fafafa;
+    border-radius: 6px;
+    padding: 18px 22px;
+    margin-bottom: 16px;
+  }
+  .c h3 { font-size: 15px; font-weight: 700; color: #1a237e; margin-bottom: 8px; }
+
+  /* ── Grid ───────────────────── */
+  .g2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:16px; }
+  .g3 { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:16px; }
+  .gc { background:#fafafa; border-radius:6px; padding:18px 20px; }
+  .gc .gv { font-size:22px; font-weight:800; color:#1a237e; }
+  .gc .gl { font-size:12px; color:#777; margin-top:4px; line-height:1.5; }
+
+  /* ── Flow ───────────────────── */
+  .fl {
+    display:flex; gap:0; border:1px solid #e0e0e0; border-radius:6px;
+    overflow:hidden; margin-bottom:14px; overflow-x:auto;
+  }
+  .fl .fs {
+    flex:1 1 0; min-width:95px; padding:16px 8px;
+    text-align:center; border-right:1px solid #e0e0e0; background:#fff;
+  }
+  .fl .fs:last-child { border-right:none; }
+  .fl .fs .fd {
+    display:inline-flex; align-items:center; justify-content:center;
+    width:26px; height:26px; border-radius:50%;
+    font-size:12px; font-weight:700; margin-bottom:6px;
+    color:#fff;
+  }
+  .fl .fs .fd.n { background: #5c6bc0; }
+  .fl .fs .fd.s { background: #66bb6a; }
+  .fl .fs .fd.e { background: #ef5350; }
+  .fl .fs h4 { font-size:12px; font-weight:600; color:#333; margin-bottom:2px; }
+  .fl .fs p { font-size:11px; color:#888; }
+
+  /* ── Timeline ──────────────── */
+  .tl { display:flex; gap:4px; flex-wrap:wrap; margin-bottom:14px; }
+  .tl .tm {
+    flex:1 1 55px; min-width:60px; background:#fff;
+    border:1px solid #e0e0e0; border-radius:6px;
+    padding:10px 2px; text-align:center; font-size:11px;
+  }
+  .tl .tm.on {
+    background: #e8eaf6;
+    border-color: #5c6bc0;
+  }
+  .tl .tm .mo { font-weight:700; font-size:12px; color:#333; margin-bottom:2px; }
+  .tl .tm.on .mo { color: #1a237e; }
+  .tl .tm .re { font-size:10px; color:#999; }
+
+  /* ── Do / Don't ────────────── */
+  .dd { border-radius:6px; padding:16px 18px; }
+  .dd.g { background:#e8f5e9; border:1px solid #c8e6c9; }
+  .dd.r { background:#ffebee; border:1px solid #ffcdd2; }
+  .dd h4 { font-size:14px; font-weight:700; margin-bottom:6px; }
+  .dd.g h4 { color:#2e7d32; }
+  .dd.r h4 { color:#c62828; }
+  .dd div { font-size:13px; padding:1px 0; color:#555; }
+
+  /* ── Checklist ─────────────── */
+  .chk { list-style:none; padding:0; }
+  .chk li {
+    padding:7px 0; border-bottom:1px dashed #e0e0e0;
+    font-size:13px; color:#555;
+    display:flex; align-items:flex-start; gap:8px;
+  }
+  .chk li:last-child { border-bottom:none; }
+  .chk li::before { content:'☐'; font-size:15px; color:#bdbdbd; flex-shrink:0; }
+
+  /* ── Footer ────────────────── */
+  .ft {
+    text-align:center; padding:28px 20px 24px;
+    color:#aaa; font-size:11px; line-height:1.8;
+    border-top:1px solid #eee;
+  }
+
+  @media (max-width:640px) {
+    body { padding:8px; }
+    .hdr, .sec { padding:20px; }
+    .g2, .g3 { grid-template-columns:1fr; }
+    .hdr .kpis { gap:12px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="hdr">
+  <div class="badge">BACKTEST &nbsp; 2014.01 – 2026.06 &nbsp; · &nbsp; 12.5 YEARS</div>
+  <h1>普通人<em>投资</em>操作手册</h1>
+  <p class="sub">F2 盈利收益率 · F5 低波动 · F6 中期动量 — 三因子等权量化策略</p>
+  <div class="kpis">
+    <div class="kp"><div class="v up">+776.27%</div><div class="lb">累计收益</div></div>
+    <div class="kp"><div class="v dn">−37.18%</div><div class="lb">最大回撤</div></div>
+    <div class="kp"><div class="v">0.67</div><div class="lb">SHARPE</div></div>
+    <div class="kp"><div class="v">0.13</div><div class="lb">ALPHA</div></div>
+    <div class="kp"><div class="v">0.77</div><div class="lb">BETA</div></div>
+  </div>
+</div>
+
+<nav class="nav">
+  <a href="#s1">理念</a>
+  <a href="#s2">选股</a>
+  <a href="#s3">调仓</a>
+  <a href="#s4">纪律</a>
+  <a href="#s5">数据</a>
+  <a href="#s6">工具</a>
+  <a href="#s7">FAQ</a>
+</nav>
+
+<!-- ═══ 1 ═══ -->
+<section id="s1" class="sec">
+  <h2>一、核心理念</h2>
+
+  <div class="cl g">
+    <span class="cl-t">核心一句话</span>
+    买入「便宜、稳定、有趋势」的股票 → 分散 50 只 → 每季度调仓 → 始终满仓 → 长期坚持
+  </div>
+
+  <div class="g3">
+    <div class="gc"><div class="gv">等权</div><div class="gl">三因子各 1/3<br>Z-score 标准化合成</div></div>
+    <div class="gc"><div class="gv">5 / 9 / 11</div><div class="gl">季度调仓<br>首个交易日 14:50</div></div>
+    <div class="gc"><div class="gv">50 只</div><div class="gl">等权持仓<br>单只上限 5%</div></div>
+  </div>
+
+  <div class="tw">
+    <table>
+      <thead><tr><th>因子</th><th>定义</th><th>直观理解</th><th>权重</th></tr></thead>
+      <tbody>
+        <tr><td><strong>F2 · 盈利收益率</strong></td><td>净利润 ÷ 总市值 (= 1/PE)</td><td>PE=10 → 10年回本 &nbsp;/&nbsp; PE=50 → 50年</td><td>1/3</td></tr>
+        <tr><td><strong>F5 · 低波动</strong></td><td>40日收益率标准差（取负号）</td><td>±1% → 稳 &nbsp;/&nbsp; ±5% → 不稳</td><td>1/3</td></tr>
+        <tr><td><strong>F6 · 中期动量</strong></td><td>P(−21) / P(−61) − 1</td><td>1月前＞2月前 → 涨 &nbsp;/&nbsp; 反之 → 跌</td><td>1/3</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="cl o">
+    <span class="cl-t">🛡 回撤保护（自动）</span>
+    净值回撤 &gt; 20% → 降仓至 85%；回撤 &lt; 15% → 恢复满仓。仅在状态切换时触发。
+  </div>
+
+  <div class="c">
+    <h3>完整操作流程</h3>
+    <div class="fl">
+      <div class="fs"><div class="fd n">1</div><h4>基础过滤</h4><p>剔除 ST/次新/金融</p></div>
+      <div class="fs"><div class="fd n">2</div><h4>因子计算</h4><p>EP·波动率·动量</p></div>
+      <div class="fs"><div class="fd n">3</div><h4>Z-score</h4><p>等权合成</p></div>
+      <div class="fs"><div class="fd n">4</div><h4>选前 50</h4><p>排名取前50</p></div>
+      <div class="fs"><div class="fd e">5</div><h4>卖出旧股</h4><p>不在名单→清仓</p></div>
+      <div class="fs"><div class="fd s">6</div><h4>买入新股</h4><p>等权建仓</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 2 ═══ -->
+<section id="s2" class="sec">
+  <h2>二、选股流程</h2>
+
+  <div class="c">
+    <h3>第一步 · 剔除不合格</h3>
+    <div class="tw" style="margin-bottom:0;">
+      <table>
+        <thead><tr><th>剔除条件</th><th>原因</th></tr></thead>
+        <tbody>
+          <tr><td>ST / *ST</td><td>退市风险，财务异常</td></tr>
+          <tr><td>上市 &lt; 1年</td><td>次新股波动大，数据不稳定</td></tr>
+          <tr><td>银行 / 券商 / 保险</td><td>金融股报表特殊，不适用EP估值</td></tr>
+          <tr><td>日均成交额 &lt; 1000万</td><td>流动性太差</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="c">
+    <h3>第二步 · 三个核心指标</h3>
+    <div class="tw" style="margin-bottom:0;">
+      <table>
+        <thead><tr><th>指标</th><th>计算</th><th>数据来源</th><th>方向</th></tr></thead>
+        <tbody>
+          <tr><td><strong>① EP</strong></td><td>归母净利润 / 总市值</td><td>最新季报</td><td>越高越好</td></tr>
+          <tr><td><strong>② 波动率</strong></td><td>std(日收益率, 40d)</td><td>过去 40 个交易日</td><td>越低越好</td></tr>
+          <tr><td><strong>③ 动量</strong></td><td>P(−21) / P(−61) − 1</td><td>21天前、61天前收盘价</td><td>越高越好（正=涨）</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="c">
+    <h3>第三步 · Z-score 等权合成</h3>
+
+    <style>
+      .math { font-family: 'Times New Roman', 'Noto Serif SC', serif; font-style: italic; }
+      .math b { font-style: normal; }
+      .frac { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; margin: 0 2px; }
+      .frac .num { line-height: 1.1; padding: 0 4px; }
+      .frac .den { line-height: 1.1; padding: 0 4px; }
+      .frac .bar { display: block; width: 100%; height: 1.5px; background: #333; margin: 1px 0; }
+    </style>
+
+    <div style="background:#fff;border:1px solid #e0e0e0;border-radius:6px;padding:20px 20px;margin-bottom:8px;overflow-x:auto;">
+      <div style="display:flex;align-items:center;justify-content:center;gap:4px;font-size:17px;white-space:nowrap;">
+        <span class="math"><b>S</b></span>
+        <span style="margin:0 4px;">=</span>
+        <span class="frac">
+          <span class="num math" style="color:#1565c0;">Z<sub>EP</sub></span>
+          <span class="bar"></span>
+          <span class="den math"><b>3</b></span>
+        </span>
+        <span style="margin:0 4px;">+</span>
+        <span class="frac">
+          <span class="num math" style="color:#e65100;">Z<sub>−σ</sub></span>
+          <span class="bar"></span>
+          <span class="den math"><b>3</b></span>
+        </span>
+        <span style="margin:0 4px;">+</span>
+        <span class="frac">
+          <span class="num math" style="color:#2e7d32;">Z<sub>MOM</sub></span>
+          <span class="bar"></span>
+          <span class="den math"><b>3</b></span>
+        </span>
+      </div>
+    </div>
+    <p style="font-size:12px;color:#888;">Z(x) = (x−μ)/σ，标准化后三个因子量纲一致，取前 <strong>50 只</strong>。</p>
+  </div>
+
+  <div class="cl o">
+    <span class="cl-t">🧪 模拟示例</span>
+    A 钢铁（EP 12.5%, 波动 1.2%, 动量 +8.3%）— 高分入选；C 白酒（EP 3.3%, 波动 4.2%, 动量 −15.6%）— 贵、不稳、阴跌，淘汰。
+  </div>
+
+  <div class="cl g">
+    <span class="cl-t">🧑‍💻 手工简化版</span>
+    ① 同花顺选股器：PE &lt; 15, 上市 &gt; 1年, 非ST, 非金融, 成交额 &gt; 5000万<br>
+    ② 导出 Excel，人工剔除暴涨暴跌 / 持续阴跌股<br>
+    ③ 保留 30–50 只，尽量分散行业
+  </div>
+</section>
+
+<!-- ═══ 3 ═══ -->
+<section id="s3" class="sec">
+  <h2>三、调仓日历</h2>
+
+  <div class="c">
+    <h3>12 个月节奏</h3>
+    <div class="tl">
+      <div class="tm"><div class="mo">1月</div><div class="re">观望</div></div>
+      <div class="tm"><div class="mo">2月</div><div class="re">观望</div></div>
+      <div class="tm"><div class="mo">3月</div><div class="re">年报</div></div>
+      <div class="tm"><div class="mo">4月</div><div class="re">年报毕</div></div>
+      <div class="tm on"><div class="mo">5月</div><div class="re">调仓</div></div>
+      <div class="tm"><div class="mo">6月</div><div class="re">不动</div></div>
+      <div class="tm"><div class="mo">7月</div><div class="re">不动</div></div>
+      <div class="tm"><div class="mo">8月</div><div class="re">半年报</div></div>
+      <div class="tm on"><div class="mo">9月</div><div class="re">调仓</div></div>
+      <div class="tm"><div class="mo">10月</div><div class="re">三季报</div></div>
+      <div class="tm on"><div class="mo">11月</div><div class="re">调仓</div></div>
+      <div class="tm"><div class="mo">12月</div><div class="re">不动</div></div>
+    </div>
+  </div>
+
+  <div class="c">
+    <h3>调仓日时间线（5 / 9 / 11月首个交易日）</h3>
+    <div class="fl">
+      <div class="fs"><div class="fd n">1</div><h4>14:00 前</h4><p>执行选股</p></div>
+      <div class="fs"><div class="fd n">2</div><h4>14:00–14:30</h4><p>对比名单</p></div>
+      <div class="fs"><div class="fd e">3</div><h4>14:30–14:50</h4><p>卖出旧股</p></div>
+      <div class="fs"><div class="fd s">4</div><h4>14:50</h4><p>买入新股</p></div>
+      <div class="fs"><div class="fd n">5</div><h4>15:00</h4><p>记录明细</p></div>
+    </div>
+  </div>
+
+  <div class="cl r">
+    <span class="cl-t">⚠ 调仓铁律</span>
+    一次性完成 · 大跌照常 · 大涨不追 · 换手率 &lt; 50%
+  </div>
+</section>
+
+<!-- ═══ 4 ═══ -->
+<section id="s4" class="sec">
+  <h2>四、持仓与纪律</h2>
+
+  <div class="g2">
+    <div class="gc"><div class="gv">50 只</div><div class="gl">标准持仓 · 资金 &lt;10万 → 10-20只</div></div>
+    <div class="gc"><div class="gv">≤ 5%</div><div class="gl">单只上限 · 50只时等权 2%</div></div>
+  </div>
+
+  <div class="tw">
+    <table>
+      <thead><tr><th>资金量</th><th>持仓</th><th>每只金额</th><th>注意</th></tr></thead>
+      <tbody>
+        <tr><td>&lt; 10 万</td><td>10–20</td><td>0.5–1 万</td><td>控制手续费</td></tr>
+        <tr><td>10–50 万</td><td>30–50</td><td>0.3–1 万</td><td>分散度足够</td></tr>
+        <tr><td>50–500 万</td><td>50</td><td>1–10 万</td><td>标准配置</td></tr>
+        <tr><td>&gt; 500 万</td><td>50</td><td>&gt; 10 万</td><td>注意小票流动性</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="g2">
+    <div class="dd r"><h4>❌ 绝对不要做</h4><div>单只重仓 · 频繁交易</div><div>追涨杀跌 · 听消息</div><div>逃顶抄底 · 择时</div><div>加杠杆 · 借钱炒股</div></div>
+    <div class="dd g"><h4>✅ 必须坚持做</h4><div>分散 30–50 只</div><div>每季度调仓一次</div><div>始终保持满仓</div><div>严格按三因子排名</div></div>
+  </div>
+
+  <div class="c">
+    <h3>三大纪律</h3>
+    <p style="font-size:14px;line-height:2.3;">
+      1. <strong>季度调仓</strong> — 每季度首个交易日，雷打不动<br>
+      2. <strong>始终满仓</strong> — 不空仓等机会，不半仓观望<br>
+      3. <strong>严格选股</strong> — 按三因子排名，不主观判断
+    </p>
+  </div>
+
+  <div class="cl o">
+    <span class="cl-t">🧠 心理建设</span>
+    35% 回撤 100万→65万，这很正常 · 单年可能大幅跑输 · 需要 3–5 年才体现优势 · 大跌时按计划调仓是超额收益来源
+  </div>
+
+  <div class="c">
+    <h3>季度调仓执行清单</h3>
+    <ul class="chk">
+      <li>1. 选股器筛选（PE&lt;15, 非ST, 非金融, 成交额&gt;5000万）</li>
+      <li>2. 计算 40 日波动率（或人工剔除暴涨暴跌）</li>
+      <li>3. 判断中期动量趋势（或人工剔除阴跌股）</li>
+      <li>4. 三因子综合排名，选前 50 只</li>
+      <li>5. 对比当前持仓，确定卖出/买入清单</li>
+      <li>6. 卖出不在新名单的（14:30–14:50）</li>
+      <li>7. 买入新名单未持有的（14:50，等权）</li>
+      <li>8. 调整权重确保等权</li>
+      <li>9. 记录本次调仓</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ═══ 5 ═══ -->
+<section id="s5" class="sec">
+  <h2>五、收益与风险</h2>
+
+  <div class="tw">
+    <table>
+      <thead><tr><th>指标</th><th>回测值</th></tr></thead>
+      <tbody>
+        <tr><td><strong>回测区间</strong></td><td>2013-12-30 至 2026-06-26（12.5年） · 基准：中证全指</td></tr>
+        <tr><td><strong>累计收益</strong></td><td><strong style="color:#2e7d32;">+731.95%</strong> &nbsp; 基准 +121.24%（策略跑赢 6 倍）</td></tr>
+        <tr><td><strong>年化收益</strong></td><td><strong style="color:#2e7d32;">+19.08%</strong></td></tr>
+        <tr><td><strong>最大回撤</strong></td><td><strong style="color:#c62828;">−34.93%</strong></td></tr>
+        <tr><td><strong>Sharpe / Alpha / Beta</strong></td><td>0.644 &nbsp;/&nbsp; 0.129 &nbsp;/&nbsp; 0.777</td></tr>
+        <tr><td><strong>胜率 / 盈亏比</strong></td><td>56.1% &nbsp;/&nbsp; 2.10（月度）</td></tr>
+        <tr><td><strong>索提诺比率</strong></td><td>0.816</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="cl g"><span class="cl-t">✅ 跨样本验证 PASS</span>AllA · CSI300 · CSI500 三样本 2026-06-29 全部通过。</div>
+
+  <div class="tw">
+    <table>
+      <thead><tr><th>市场环境</th><th>时间</th><th>表现</th></tr></thead>
+      <tbody>
+        <tr><td>大牛市</td><td>2014–2015</td><td>跟涨 · 弱于大盘但盈利</td></tr>
+        <tr><td>股灾</td><td>2015 H2</td><td>抗跌 · 回撤显著小于大盘</td></tr>
+        <tr><td>白马慢牛</td><td>2016–2017</td><td>跑赢 · 低估值+趋势双击</td></tr>
+        <tr><td>熊市</td><td>2018</td><td>抗跌 · 回撤小于大盘</td></tr>
+        <tr><td>核心资产牛市</td><td>2019–2020</td><td>持平 · 趋势修复旧版−46pp</td></tr>
+        <tr><td>震荡下跌</td><td>2021–2022</td><td>显著跑赢 · 低波+趋势防御</td></tr>
+        <tr><td>结构性行情</td><td>2022–2026</td><td>跑输 · 趋势快速轮动摩擦</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="cl r">
+    <span class="cl-t">⚠ 风险提示</span>
+    历史不代表未来 · 35% 回撤需极强心理 · 因子可能阶段性失效 · 趋势因子快速轮动中可能失效 · &gt;2000万注意流动性
+  </div>
+</section>
+
+<!-- ═══ 6 ═══ -->
+<section id="s6" class="sec">
+  <h2>六、实操工具</h2>
+
+  <div class="tw">
+    <table>
+      <thead><tr><th>工具</th><th>用途</th><th>推荐</th></tr></thead>
+      <tbody>
+        <tr><td>同花顺 选股器</td><td>PE / 上市时间 / ST / 行业 / 成交额筛选</td><td>★★★★★</td></tr>
+        <tr><td>东方财富 选股器</td><td>同上，数据更新更快</td><td>★★★★★</td></tr>
+        <tr><td>理杏仁</td><td>财务数据查询</td><td>★★★★</td></tr>
+        <tr><td>雪球</td><td>股票讨论（只看不跟）</td><td>★★</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="c">
+    <h3>同花顺操作步骤</h3>
+    <p style="line-height:2.1;">
+      选股 → 条件选股 → PE(TTM)&lt;15 · 上市&gt;252天 · 非ST · 剔除金融 · 成交额&gt;5000万<br>
+      → 导出 Excel → STDEV.P 算波动率 → 对比 21天前/61天前股价判趋势 → 排名取前50
+    </p>
+  </div>
+</section>
+
+<!-- ═══ 7 ═══ -->
+<section id="s7" class="sec">
+  <h2>七、常见问题</h2>
+
+  <div class="c"><h3>资金 &lt; 10万</h3><p>买 10–20 只，每只 0.5–1 万。太少不够分散，太多手续费占比高。</p></div>
+  <div class="c"><h3>什么时候卖出</h3><p>只在季度调仓时。跌 50% 但还在名单里就不卖。唯一卖出信号：不在新名单。</p></div>
+  <div class="c"><h3>可以择时吗</h3><p>不可以。多次量化验证择时降低收益。始终满仓是最优解。</p></div>
+  <div class="c"><h3>大跌怎么办</h3><p>按计划调仓。2015 股灾回撤 37% 后恢复创新高。</p></div>
+  <div class="c"><h3>能加杠杆吗</h3><p>绝对不行。35%回撤 + 杠杆 = 爆仓。</p></div>
+  <div class="c"><h3>买基金代替</h3><p>红利低波(515450) / 中证红利(515080) / 价值ETF(510030) 理念相近。</p></div>
+  <div class="c"><h3>会失效吗</h3><p>会。每 3–5 年评估，连续 3 年跑输考虑调整。在那之前坚持执行。</p></div>
+</section>
+
+<div class="ft">
+  P5-F6-MOM-2026Q2-v1 · F2+F5+F6-40d 三因子最终版 · 跨样本验证 2026-06-29 PASS<br>
+  策略代码 results/P5-F2F5F6-40d-final-strategy.py &nbsp;|&nbsp; 研究脚本 research/scripts/<br>
+  仅供参考，不构成投资建议。投资有风险，入市需谨慎。
+</div>
+
+</div>
+</body>
+</html>

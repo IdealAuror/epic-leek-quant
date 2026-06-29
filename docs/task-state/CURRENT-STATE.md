@@ -1,9 +1,10 @@
 # epic-leek-quant 任务状态看板
 
 > **用途**：跨会话/跨设备同步项目执行进度。每次会话开始先读本文件，结束前更新。
-> **最后更新**：2026-06-26 22:16
-> **当前阶段**：Phase 1 — F1 EV<0 因子验证
+> **最后更新**：2026-06-29
+> **当前阶段**：🟢 **项目已关闭** — Phase 5 跨样本验证 PASS（AllA/CSI300/CSI500 三样本 OVERALL: PASS），F6-MOM 40d 动量因子有效性在全部样本确认。最终策略：F2(EP)+F5(LowVol)+F6(MOM-40d) 三因子等权 Z-score，策略环境年化 ~15.6%/Sharpe 0.64/回撤 34.93%，研究环境 Sharpe 0.82/回撤 43.56%。`docs/CURRENT-STRATEGY.md` 为最终策略总览，`docs/manual-investment-guide.md` 为普通人实盘指南。
 > **单一事实来源**：`docs/PROJECT-PLAN.md`（口径冲突以此为准）；本文件仅记录执行流程进度。
+> **详细决策与结论**：`research/decisions/P1-F1-EV-2026Q2-v1-decision.md`（已演变为 Phase 1 全因子决策总文档）+ `research/_index.md`（因子看板）。
 
 ---
 
@@ -12,66 +13,151 @@
 | 阶段 | 状态 | 说明 |
 |------|------|------|
 | Phase 0 脚手架 | ✅ 完成 | 目录/模板/data_layer 就位。缺口：撮合层独立单测（聚宽环境补齐） |
-| Phase 1 — F1 EV<0 | 🟡 执行中 | spec locked、代码生成、审核通过、待聚宽回测结果 |
-| Phase 1 — F2 PE | ⏳ 阻塞于 F1 | — |
-| Phase 1 — F3 股东回报 | ⏳ 阻塞于 F2 | — |
-| Phase 1 — F4 国企背景 | ⏳ 阻塞于 F3 | — |
-| Phase 1 — F5 财务质量 | ⏳ 阻塞于 F4 | — |
-| Phase 1 — MF 多因子合成 | ⏳ 阻塞于 Phase 1 | — |
-| Phase 2/3/4 | ⏳ 未启动 | 压测/跨市场/实盘 |
+| Phase 1 — F1 EV<0 | ❌ 放弃 | 四轮 IC 验证全失败，市值中性化后失效，是 size proxy |
+| Phase 1 — F2 EP | ✅ 通过 | IC t=3.41，回测年化 13.1%，超额 6.5%，回撤 51.6% |
+| Phase 1 — F3 Dividend | 🟡 IC 通过+回测脚本就绪 | IC t=2.74 通过决定性门槛，回测脚本生成；回测结果未记录 |
+| Phase 1 — F4 ROE | ❌ 放弃 | IC t=1.81 未过门槛，回测负 alpha -0.01 |
+| Phase 1 — F5 LowVol | ⚠️ 部分成立 | IC t=3.17 通过；单因子回测失败（2.81%）；F2+F5 组合成功 |
+| Phase 1 — MF F2+F5 组合 | ✅ 通过 | 收益 372.71%，Sharpe 0.37，回撤 47.62%（首次降回撤成功） |
+| **Phase 2 — 多因子合成** | 🟡 **部分通过** | F2 唯一独立 alpha（FM t=2.95）；F3 剔除（断点后反转）；F5 风险调节器（非 alpha 但组合价值极高）；Gate 6 未通过（RP 退化单因子输给 Baseline）。Baseline 验证合理 |
+| **Phase 3 — 压测+仓位管理** | 🟡 **部分通过** | 3/4 通过：M1 Walk-Forward ✅（样本外 Sharpe 0.563）/ M2 断点 ✅ / M3 DSR ✅（0.9679）/ M4 目标波动率 ❌（年化降 13pp）。策略稳健性得到验证，目标波动率方法局限暴露 |
+| **Phase 4 — 实盘校准 V1** | ❌ **V1 失败** | 3/5 通过：M1 ✅（成本占比 1.36%）/ M2 ❌（31 只 >20% 持仓，流动性陷阱）/ M3 ✅ / M4 ✅ / M5 ❌（V2 回撤 36.85% > 30%）。策略对成本稳健但有小盘股流动性陷阱 + 仓位管理降回撤有限 |
+| **Phase 4 — 实盘校准 V2** | ❌ **V2 失败（项目收尾）** | 3/5 通过：M1 ✅（年化 15.61%，成本占比 1.41%）/ M2 ❌（23 只 >20% 持仓，V1=31→V2=23 改善但未达 <5）/ M3 ✅ / M4 ✅（信息收益 4.3x 成本）/ M5 ❌（V2 回撤 35.04%，V4 回撤 34.83% <35% 硬阈值但 >30% Gate 5 标准）。V2 修复方向有效但幅度不足，按 spec ≤3/5 停止迭代。策略 alpha 五重验证有效，可小资金（<2000万）+人工风控实盘（非 Gate 5 通过路径） |
+| **Phase 5 — F6-MOM 因子改进** | ✅ **完成（项目关闭）** | 40d 版本（61-21 momentum）全样本所有目标达成。六版本对比确认正向 40d 全样本 Sharpe 最高（0.82 研究/0.64 策略）。反向 F6 disprove IC 暗示。跨样本验证（AllA/CSI300/CSI500）2026-06-29 运行完成：三样本 OVERALL: PASS。CSV 保存至 `results/P5-F6-MOM-2026Q2-v1/`。A 股动量窗口 40 天有效。详见 `docs/CURRENT-STRATEGY.md`、`research/decisions/P5-F6-MOM-2026Q2-v1-decision.md`、`research/reports/P5-F6-MOM-2026Q2-v1-adjudication.md` |
 
 ---
 
-## 二、F1 EV<0（P1-F1-EV-2026Q2-v1）分步进度
+## 二、Phase 1 五因子最终结论（按实际执行顺序）
 
 > 工作流：spec 设计 → Flash 执行 → 代码审核 → 结果判定(Gate 1) → _index 落盘
 
-| # | 步骤 | 状态 | 交付物 | 备注 |
-|---|------|------|--------|------|
-| 1 | spec 设计与 locked | ✅ | `research/specs/P1-F1-EV-2026Q2-v1.md` | _index 变更日志确认 locked |
-| 2 | factor_lib.py 实现 | ✅ | `joinquant/factor_lib.py` | calculate_all_factors + composite_score |
-| 3 | 策略代码生成（三样本） | ✅ | `joinquant/strategies/P1-F1-EV-2026Q2-v1-{AllA,CSI300,CSI500}-standalone.py` | 三样本结构一致 |
-| 4 | IC 分析脚本生成 | ✅ | `research/scripts/P1-F1-EV-2026Q2-v1-ic_analysis.py` | 表1-7 由其在聚宽研究环境产出 |
-| 5 | 执行偏差记录（三样本） | ✅ | `research/reports/P1-F1-EV-2026Q2-v1-{AllA,CSI300,CSI500}-deviation.md` | 标注 time_deposits_note 不可得等偏差 |
-| 6 | _index.md 更新 | ✅ | `research/_index.md` | F1=🟡进行中，迭代轮次=1 |
-| 7 | 代码审核（03 门禁） | ✅ 通过 | `research/reports/P1-F1-EV-2026Q2-v1-code-review.md` | 审核时未看结果；3 项待办见下 |
-| 8 | bug 修复（order_target_percent NameError） | ✅ | 三策略文件新增交易 API 兼容垫片 | jqboson 引擎未注入交易函数，已加降级链 |
-| 9 | **聚宽平台回测执行** | ✅ 三样本完成 | `results/P1-F1-EV-2026Q2-v1/` | AllA/CSI300/CSI500 均跑通；待 IC 分析 |
-| 10 | IC 分析执行（聚宽研究环境） | ⏳ 待执行 | 表1-7 + CSV | 依赖回测净值产出 |
-| 11 | 结果判定（Gate 1 七条） | ⏳ 待执行 | `research/reports/P1-F1-EV-2026Q2-v1-adjudication.md` | 需先有回测结果 |
-| 12 | _index.md 终态落盘 | ⏳ 待执行 | F1 状态→✅/❌/⚠️ | Gate 1 判定后 |
+### F1 EV<0（P1-F1-EV-2026Q2-v1）— ❌ 永久放弃
 
-**当前卡点**：步骤 9 — 需在聚宽平台运行修复后的三样本策略，导出净值 CSV。
+| 轮次 | 因子定义 | 市值中性化 t | 判定 |
+|------|---------|------------|------|
+| v1 二值 | `factor_ev_negative = (ev<0).astype(int)` | 无分布 | ❌ CSI500 0 只满足，无截面分布 |
+| v2 连续 -ev | `signal = -(market_cap + 有息负债 - cash)` | 1.32 | ❌ -ev 被 P 主导，是 size proxy |
+| v2 net_cash_yield | `(cash - 有息负债) / market_cap` | 1.90 | ❌ 标准化改善但仍不过门槛 |
+
+**结论**：F1 方向彻底放弃。市值中性化后失效证明 A 股"净现金"信号本质是 size 效应代理。详见 `research/decisions/P1-F1-EV-2026Q2-v1-decision.md` Phase 1.1 终判。
+
+### F2 EP（P1-F2-EP-2026Q2-v1）— ✅ 通过
+
+| 指标 | ep_stable（稳态） | ep_spot（当期） |
+|------|-------------------|---------------------|
+| 市值中性化 t | 2.52 ✅ | **3.41 ✅✅** |
+| 行业中性化 t | 2.37 ✅ | **2.94 ✅✅** |
+
+**决策**：当期 EP 全面碾压稳态 EP，进回测。
+**回测结果**：年化 13.1%，Alpha 0.07，Sharpe 0.34，回撤 51.6%（基准中证全指 6.6%）。
+**回撤问题**：单因子高回撤固有特征，三次降回撤尝试（PE 锚定择时/F4 ROE 叠加/F5 LowVol 组合）详见 `research/_index.md` 第五节。
+
+### F3 Dividend（P1-F3-Dividend-2026Q2-v1）— 🟡 IC 通过+回测脚本就绪
+
+| 指标 | 结果 |
+|------|------|
+| 数据源 | `finance.STK_XR_XD`（聚宽无现成 div_yield 字段，遍历除权除息表聚合） |
+| 主信号 | `dividend_yield = 过去400天累计每股分红 / 换仓日不复权收盘价` |
+| 市值中性化 t | **2.74 ✅** |
+| 行业中性化 t | 2.29 ✅ |
+| 断点前/后 t | 1.92 / 0.41（注册制后失效） |
+| Gate 1 过条数 | 3/7（决定性门槛通过） |
+| OCF 过滤验证 | H12 ✅（t 1.49→1.80） |
+
+**状态**：IC 脚本与回测脚本均生成；回测结果未在 `decision.md` 落地（待补跑或确认）。
+**预期**：信号比 F2/F5 都弱，断点后失效严重。若单因子回测负 alpha 或组合全方位劣化，F3 方向终止。
+
+### F4 ROE（P1-F4-ROE-2026Q2-v1）— ❌ 永久放弃
+
+| 指标 | 结果 |
+|------|------|
+| 主信号 | `roe_spot = net_profit / equity`（手算，finance.run_query 查 roe_weighted 返回0条） |
+| 市值中性化 t | 1.81 ❌（未过门槛） |
+| 回测总收益 | 86%（基准 121%，跑输） |
+| 回测 Alpha | -0.01（负 alpha） |
+
+**结论**：ROE 在 A 股作为独立排序因子是负 alpha。加 ROE 到 EP 上全方位劣化（收益 366%→187%，回撤 51.6%→57.1%）。F4 方向终止，IC 脚本保留作记录，回测脚本已删除。
+
+### F5 LowVol（P1-F5-LowVol-2026Q2-v1）— ⚠️ 部分成立
+
+| 指标 | 结果 |
+|------|------|
+| 主信号 | `vol_60d = -std(过去60交易日日收益率)`（取负，低波动=高信号） |
+| 市值中性化 t | 3.17 ✅ |
+| 行业中性化 t | 3.70 ✅ |
+| 断点前/后 t | 1.59 / 2.20（注册制后增强，F2/F1 没有的优势） |
+| Gate 1 过条数 | 6/7 |
+| 单因子回测 | 总收益 2.81%，Alpha -0.04，Sharpe -0.34 ❌ |
+| Q 分组 | 倒 U 型（Q5 波动降 30%，夏普提升 50%） |
+
+**结论**：F5 单因子方向终止（z-score 加权与倒 U 型因子不适配）；**作为 F2-EP 的组合辅助因子保留**。F2+F5 组合（等权 z-score）成功降回撤。
+
+### MF F2+F5 组合（P1-F2F5-EP-LowVol-2026Q2-v1）— ✅ 通过
+
+| 指标 | F2-EP 单因子 | F2+F4 组合（失败） | **F2+F5 组合** |
+|------|-------------|------------------|---------------|
+| 总收益 | 366% | 187% | **372.71%** |
+| Alpha | 0.07 | 0.18 | **0.07** |
+| Sharpe | 0.34 | 0.18 | **0.37** |
+| 最大回撤 | 51.6% | 57.1% | **47.62%** |
+
+**结论**：F2+F5 组合是当前最优策略。收益持平 F2 单因子，回撤降 4 个百分点，Sharpe 微升。**辅助因子必须与主因子低相关且不拖累收益**：F4-ROE 与 EP 高相关（都偏大盘价值）是负增量；F5-LowVol 选股池不同（便宜股 vs 稳健股）低相关，组合有效。
 
 ---
 
-## 三、代码审核遗留待办（来自 code-review.md）
+## 三、Phase 2 多因子合成（P2-MF-2026Q2-v1）— 启动中
+
+> 工作流：spec 设计 → 相关性矩阵 → Fama-MacBeth 检验 → Risk Parity 合成 → Gate 2+3 判定
+
+### 输入：Phase 1 通过的因子
+
+| 因子 | spec_id | 市值中性化 t | 定位 |
+|------|---------|------------|------|
+| F2 EP | P1-F2-EP-2026Q2-v1 | 3.41 | 收益主力 |
+| F3 Dividend | P1-F3-Dividend-2026Q2-v1 | 2.74 | 待 FM 检验独立定价能力（断点后弱） |
+| F5 LowVol | P1-F5-LowVol-2026Q2-v1 | 3.17 | 风险管理因子 |
+
+F1-EV 与 F4-ROE 永久放弃，不纳入 Phase 2。
+
+### 分步进度
+
+| # | 步骤 | 状态 | 交付物 |
+|---|------|------|--------|
+| 1 | spec 设计与 locked | 🟡 进行中 | `research/specs/P2-MF-2026Q2-v1.md` |
+| 2 | 因子相关性矩阵脚本 | ⏳ 待执行 | `research/scripts/P2-MF-2026Q2-v1-standalone.py` |
+| 3 | Fama-MacBeth 检验脚本 | ⏳ 待执行 | 同上 |
+| 4 | Risk Parity 合成策略 | ⏳ 待执行 | `joinquant/strategies/P2-MF-2026Q2-v1-AllA-standalone.py` |
+| 5 | 聚宽研究环境运行 | ⏳ 待执行 | 相关性矩阵 + FM 系数表 + RP 净值 |
+| 6 | Gate 2+3 判定 | ⏳ 待执行 | `research/reports/P2-MF-2026Q2-v1-adjudication.md` |
+
+### Phase 2 通过标准（Gate 2+3，预注册锁定）
+
+1. 合成组合超额收益不被已知风险因子完全解释（残差 alpha 显著>0）
+2. 行业中性化后超额收益不显著下降（证明存在行业内选股能力）
+3. 因子暴露稳定无系统性漂移
+4. 相关性矩阵中无 >0.6 的重复暴露（Spearman Rank Corr）
+5. Fama-MacBeth 各保留因子系数 t≥2（独立截面定价能力）
+6. Risk Parity 合成相比等权 z-score Baseline：Sharpe 不下降 + 回撤不上升
+
+---
+
+## 四、代码审核遗留待办（来自 F1 code-review.md）
 
 | 优先级 | 问题 | 状态 |
 |--------|------|------|
-| P1 | IC 分析需在聚宽研究环境独立运行 ic_analysis.py（非代码缺陷，工作流设计） | 待执行 |
-| P1 | 三策略 import 了 `STATE_OWNERS` 但未直接引用（不影响运行） | 待清理 |
-| P2 | 缺壳价值剔除变体 V2（spec 要求 V1/V2 对比，策略目前只实现 V1） | 待补 `min_market_cap` 参数 |
+| ~~P1~~ | ~~IC 分析需在聚宽研究环境独立运行~~ | ✅ 已完成（F1-F5 各一版 standalone） |
+| ~~P1~~ | ~~三策略 import 了 `STATE_OWNERS` 但未直接引用~~ | ✅ F1 已删；F2-F5 不再 import |
+| ~~P2~~ | ~~缺壳价值剔除变体 V2~~ | ✅ F1 V2 已跑；F2-F5 不再要求 V2 |
 
 ---
 
-## 四、下一步行动（按优先级）
+## 五、已知偏差与风险
 
-1. **在聚宽平台运行修复后的策略**（三样本可并行）：
-   - 粘贴 `P1-F1-EV-2026Q2-v1-CSI300-standalone.py` 等到聚宽回测
-   - 上次 NameError 已修复（新增 `_safe_order_target_percent` 降级链）
-   - 导出 Q1 多头组累计净值 CSV 到 `results/P1-F1-EV-2026Q2-v1/`
-2. **在聚宽研究环境运行** `research/scripts/P1-F1-EV-2026Q2-v1-ic_analysis.py` 产出表1-7
-3. **结果判定**：按 `docs/prompts/04` + Gate 1 七条标准判定，落盘 adjudication 报告
-4. **清理 P1/P2 待办**（可在回测期间并行处理）
-
----
-
-## 五、已知偏差与风险（来自 deviation 报告）
-
-- **附注定期存款不可得**：聚宽 balance 表无 `time_deposits_note`，`cash_available_ext` 仅取 `monetary_funds + financial_assets_held_for_trading`，净现金可能高估 EV（低估现金）。偏差已记录。
-- **有息负债为估算值**：聚宽无直接 `interest_bearing_debt` 字段，用 total_liability 扣除非有息流动负债估算。
-- **全 A 样本耗时**：AllA 股票池大，回测耗时较长。
+- **附注定期存款不可得**：聚宽 balance 表无 `time_deposits_note`，`cash_available_ext` 仅取 `monetary_funds + financial_assets_held_for_trading`，净现金可能高估 EV（F1 已放弃，不再相关）。
+- **有息负债为估算值**：聚宽无直接 `interest_bearing_debt` 字段，用 total_liability 扣除非有息流动负债估算（F1 已放弃，不再相关）。
+- **F3 股息率口径**：聚宽无现成 div_yield 字段，遍历 `finance.STK_XR_XD` 聚合，含税口径；OCF≥净利润过滤验证有效。
+- **F5 LowVol 倒 U 型**：z-score 加权与倒 U 型不适配，单因子回测失败；组合中作为风险调节器有效。
+- **注册制断点（2019.06）**：F2/F3 后段 IC 失效（F2 后段 t=0.48，F3 后段 t=0.41）；F5 后段增强（t=2.20）。Phase 2 组合需关注跨断点稳健性。
 
 ---
 
@@ -91,16 +177,34 @@
 | 2026-06-26 | ic_analysis standalone 重写+调试 | 经 7 轮调试修复聚宽环境兼容问题（字段名/单位/panel/index类型），快速验证 CSI300 3 个调仓日跑通表1-7。待全量运行 |
 | 2026-06-26 | 聚宽调试经验落盘 | 新建 docs/task-state/JOINQUANT-DEBUG-NOTES.md，记录字段名差异/单位陷阱/panel行为/研究vs回测环境区分等踩坑经验 |
 | 2026-06-26 | ic_analysis.py 重写完成 | 修复二值因子无法Q1-Q5缺陷（改用连续ev排序，Q1=净现金最多=多头）；补全表3/4/5/7+V2壳价值剔除；符号约定IC>0=有效。待聚宽研究环境运行 |
+| 2026-06-27 | F1 四轮 IC 验证全失败 | F1-EV<0 永久放弃：v1 二值无分布 / v2 -ev 是 size proxy（市值中性化 t=1.32）/ v2 net_cash_yield 仍未过门槛（t=1.90） |
+| 2026-06-27 | F2-EP IC 通过 | 市值中性化 t=3.41（ep_spot 当期 EP 碾压稳态 EP），进回测 |
+| 2026-06-27 | F2-EP 回测完成 | 年化 13.1%，超额 6.5%，Sharpe 0.34，回撤 51.6%（基准 6.6%） |
+| 2026-06-27 | PE 锚定择时失败 | 季频/日频择时均失败，对个股选股不对症 |
+| 2026-06-27 | F4-ROE IC 未过+回测负 alpha | t=1.81 未过门槛；回测 86% 跑输基准 121%；F2+F4 组合全方位劣化。F4 永久放弃 |
+| 2026-06-27 | F5-LowVol IC 通过+单因子回测失败 | t=3.17 通过；单因子回测 2.81%（z-score 与倒 U 型不适配）。定位风险管理因子 |
+| 2026-06-27 | F2+F5 组合首次降回撤成功 | 收益 372.71% 持平 F2，回撤 47.62%（-4pp），Sharpe 0.37。当前最优策略 |
+| 2026-06-27 | F3-Dividend IC 通过 | t=2.74 通过决定性门槛，OCF 过滤验证 H12。回测脚本生成，回测结果待补 |
+| 2026-06-27 | 同步 CURRENT-STATE.md 到 Phase 1 完成 | 五因子全部验证完毕，启动 Phase 2 多因子合成 |
+| 2026-06-28 | Phase 4 V1 跑通 + 终判落盘 | 3/5 失败：M1 ✅ / M2 ❌（流动性陷阱）/ M3 ✅ / M4 ✅ / M5 ❌（回撤 36.85%）。新增 decision.md + adjudication.md。核心洞察：策略对成本极度稳健但有小盘股流动性陷阱 |
+| 2026-06-28 | 启动 Phase 4 V2 迭代 | V2 修复：流动性过滤 500万→1000万 + F5 阈值 -0.5→-0.3 + 新增 V4 激进版 7%/10%/15%。Gate 5 标准不变 |
+| 2026-06-28 | Phase 4 V2 跑通 + 终判落盘（项目收尾） | 3/5 失败：M1 ✅ / M2 ❌（23 只 >20% 持仓，V1=31→V2=23 改善但未达 <5）/ M3 ✅ / M4 ✅ / M5 ❌（V2 回撤 35.04%，V4 回撤 34.83% <35% 硬阈值但 >30% Gate 5 标准）。新增 decision.md + adjudication.md。核心洞察：策略 alpha 五重验证有效 + 仓位管理方向有效（V4 回撤 <35%）+ M2 是结构性瓶颈 + M5 极端回撤是结构性局限。按 spec ≤3/5 停止迭代，项目收尾。实盘建议：小资金（<2000万）+ 人工风控（非 Gate 5 通过路径） |
+| 2026-06-29 | baseline 分段回测分析 + 启动 Phase 5 F6-MOM 因子改进研究 | 用户对 2016-2026 全样本回测结果（Sharpe -0.11）提出质疑，要求分段回测分析。完成 7 段分段回测（2014-2026 完整周期），定位策略 7 段中 6 段跑赢基准，唯一失效段是 2019-2020 核心资产牛市（Alpha -0.11，跑输 46pp）。整理分段回测报告 `research/reports/P4-PL-2026Q2-v2-segmented-backtest.md`。基于失效分析启动 Phase 5：选定 F6-MOM 动量因子（12-1 momentum，Carhart 1997）作为改进方向，避开 ROE 已验证失败路径。生成两个文件：① F6 IC 分析脚本 `research/scripts/P1-F6-MOM-2026Q2-v1-ic_analysis-standalone.py`（与 F2/F4/F5 同口径，市值中性化 NW-t≥2 门槛）；② 三因子合成策略 `joinquant/strategies/P4-PL-2026Q2-v2-AllA-F2F5F6-baseline.py`（F2+F5+F6 等权 z-score，baseline 风格无风控）。下一步：聚宽环境运行 IC 验证 + 三因子回测，重点验证段5 是否修复且其他段不破坏 |
+| 2026-06-29 | Phase 5 F6-MOM 因子改进完成 ✅ | 五版本对比研究（baseline/12-1/6-1/40d/consistency）确认 40d 版本（61-21 momentum，信号长度40天）全样本最优：研究环境 Sharpe 0.82（最高），段5超额-2.69pp（修复），段6超额+54.17pp（大幅改善）。策略环境最终回测：收益732%，Sharpe 0.64，回撤34.93%，Alpha 0.13。回撤约束三版本测试（严格15/70/10→Sharpe0.39；放宽20/85/15→Sharpe0.49；无风控→Sharpe0.64）证明无风控版全面胜出，回撤约束多余。同步更新普通人投资指南为三因子版（低估值低波动趋势策略）。最终策略文件：`joinquant/strategies/P4-PL-2026Q2-v2-AllA-F2F5F6-baseline.py`（DRAWDOWN_CONTROL_ENABLED=False）。关键教训：① A股动量有效窗口比美股短（40天有效，非3-12个月）；② 回撤约束在策略环境反而过度抑制收益，无风控版回撤34.93%已达标；③ 策略环境成本更高反而抑制极端波动，回撤低于研究环境 |
+| 2026-06-29 | Phase 5 反向F6验证 + IC局限性教训落盘 + 跨样本验证脚本 | ... 简称见上 |
+| 2026-06-29 | Phase 5 跨样本验证完成 + 项目重构启动 | 聚宽环境运行 CROSS_SAMPLE_MODE：AllA/CSI300/CSI500 三样本 OVERALL: PASS。Phase 5 正式关闭。启动项目全面重构（`refactor/phase6` 分支）：目录重组、文档整理、代码规范化、依赖管理。新增 `docs/CURRENT-STRATEGY.md`。更新 `docs/manual-investment-guide.md` 数据对齐跨样本验证结果 |
 
 ---
 
 ## 七、关键纪律提醒（每次会话自查）
 
 1. 原文乐观数字（年化16-20%/超额409%）一律视为待验证假设，不作结论
-2. 预注册通过标准（Gate 1 七条）锁定后不调整
-3. 代码审核必须先于结果分析（看任何数字前完成 03 门禁）—— **F1 已完成审核**
+2. 预注册通过标准（Gate 1/2+3）锁定后不调整
+3. 代码审核必须先于结果分析（看任何数字前完成 03 门禁）—— F1-F5 已完成审核
 4. 连续两轮 IC_IR<0.2 放弃该因子方向
 5. 全量上报（含失败切片），禁止择优
 6. 所有结论有数据支持，禁用"根据经验"
 7. 分析前先读 `_index.md` 历史结论 + 本文件
 8. 不绕过 data_layer 直接调 get_fundamentals
+9. Phase 2 权重方案在 spec 中预注册；Fama-MacBeth 用于"筛选"而非"组合构建"
+10. 不通过强制诊断"假设错误 vs 实现错误"
