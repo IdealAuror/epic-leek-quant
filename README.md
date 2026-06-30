@@ -1,3 +1,5 @@
+<div align="center">
+
 [English](README.md) | [中文](README-zh.md)
 
 # 🌱 cst-quant · Cheap · Stable · Trending
@@ -16,6 +18,8 @@ annualized **+19.08%**, Sharpe **0.67**, max drawdown −37.18%.
 [![Sharpe: 0.67](https://img.shields.io/badge/Sharpe-0.67-brightgreen)](#)
 [![Annual Return: 19%](https://img.shields.io/badge/Annual_Return-19.08%25-brightgreen)](#)
 [![Status: Production](https://img.shields.io/badge/Status-Production-success)](#)
+
+</div>
 
 ---
 
